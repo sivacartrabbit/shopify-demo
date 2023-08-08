@@ -1,0 +1,7 @@
+.next/
+mysql/
+mongo/
+database/
+postgres/
+node_modules/
+package-lock.json
