@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "@/components/hooks/useFetch";
-import { useAppBridge } from "@shopify/app-bridge-react";
+import { useAppBridge, useNavigate } from "@shopify/app-bridge-react";
+import { useRouter } from "next/router";
 
 // component
 
@@ -10,15 +11,23 @@ import {
   LegacyCard,
   useIndexResourceState,
   Text,
+  Spinner,
+  Box,
+  HorizontalStack,
+  Link
 } from "@shopify/polaris";
+
 
 export default function productList() {
   const app = useAppBridge();
+  const router = useRouter()
+  const navigate = useNavigate();
   const fetch = useFetch();
 
   const [productList, setproductList] = useState([]);
 
   async function getProductsList() {
+    setproductList([]);
     await fetch(`/api/product/getProducts`, {
       method: "GET",
       headers: {
@@ -29,7 +38,6 @@ export default function productList() {
       .then((res) => res.json())
       .then((data) => {
         setproductList(data.data);
-        console.log(data);
       })
       .catch((error) => console.error("Error fetching data: ", error));
   }
@@ -43,6 +51,35 @@ export default function productList() {
     plural: "productLists",
   };
 
+  const onDeleteProduct = async () => {
+    const deleteIds = selectedResources.map((index) => {
+      const product = productList.find((data) => data.id === index);
+      return product.id;
+    });
+    await fetch("/api/product/deleteProduct", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "DELETE",
+      body: JSON.stringify(deleteIds),
+    }).then((res) => {
+     getProductsList()
+    });
+  };
+
+  const handleUpdateClick =(id) => {
+    const data = id.split('/Product/')[1]
+    router.push(`/product/productUpdate?id=${data}`)
+  }
+
+  const deleteProduct = [
+    {
+      content: "Delete Product",
+      onAction: () => onDeleteProduct(),
+    },
+  ];
+
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(productList);
 
@@ -55,42 +92,31 @@ export default function productList() {
         position={index}
       >
         <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="bold" as="span">
-            {title}
-          </Text>
+        <Link onClick={() => handleUpdateClick(String(id))}>
+            <Text variant="bodyMd" fontWeight="bold" as="span">
+              {title}
+            </Text>
+          </Link>
         </IndexTable.Cell>
-        <IndexTable.Cell>{description}</IndexTable.Cell>
+
         <IndexTable.Cell>{price}</IndexTable.Cell>
         <IndexTable.Cell>{totalInventory}</IndexTable.Cell>
+        <IndexTable.Cell>{description}</IndexTable.Cell>
       </IndexTable.Row>
     )
   );
 
   return (
-    <Page title="Products"
-    // backAction={{ content: "Products", url: "/" }}
-    //   secondaryActions={[
-    //     {
-    //       content: "Duplicate",
-          
-    //       accessibilityLabel: "Secondary action label",
-    //       onAction: () => alert("Duplicate action"),
-    //     },
-    //     {
-    //       content: "Archive",
-          
-    //       accessibilityLabel: "Secondary action label",
-    //       onAction: () => alert("Archive action"),
-    //     },
-    //     {
-    //       content: "Delete",
-          
-    //       destructive: true,
-    //       accessibilityLabel: "Secondary action label",
-    //       onAction: () => alert("Delete action"),
-    //     },
-    //   ]}
-    fullWidth>
+    <Page
+      title="Products"
+      primaryAction={{
+        content: "Create Product",
+        onAction: () => {
+          navigate("/product/productCreate");
+        },
+      }}
+      fullWidth
+    >
       <LegacyCard>
         <IndexTable
           resourceName={resourceName}
@@ -101,10 +127,18 @@ export default function productList() {
           onSelectionChange={handleSelectionChange}
           headings={[
             { title: "Title" },
-            { title: "Description" },
             { title: "Price" },
             { title: "totalInventory" },
+            { title: "Description" },
           ]}
+          promotedBulkActions={deleteProduct}
+          emptyState={
+            <Box padding="6">
+              <HorizontalStack align="center" blockAlign="center">
+                <Spinner accessibilityLabel="Spinner example" size="large" />
+              </HorizontalStack>
+            </Box>
+          }
         >
           {productRows}
         </IndexTable>

@@ -36,7 +36,7 @@ const handler = async (req, res) => {
       data: {
         query: PRODUCT_LIST,
         variables: {
-          first: 10,
+          first: 70,
         },
       },
     });
