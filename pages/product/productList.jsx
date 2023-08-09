@@ -14,13 +14,14 @@ import {
   Spinner,
   Box,
   HorizontalStack,
-  Link
+  Link,
+  Icon,
+  Button,
 } from "@shopify/polaris";
-
 
 export default function productList() {
   const app = useAppBridge();
-  const router = useRouter()
+  const router = useRouter();
   const navigate = useNavigate();
   const fetch = useFetch();
 
@@ -38,6 +39,7 @@ export default function productList() {
       .then((res) => res.json())
       .then((data) => {
         setproductList(data.data);
+        console.log(data.data);
       })
       .catch((error) => console.error("Error fetching data: ", error));
   }
@@ -64,14 +66,19 @@ export default function productList() {
       method: "DELETE",
       body: JSON.stringify(deleteIds),
     }).then((res) => {
-     getProductsList()
+      getProductsList();
     });
   };
 
-  const handleUpdateClick =(id) => {
-    const data = id.split('/Product/')[1]
-    router.push(`/product/productUpdate?id=${data}`)
-  }
+  const handleUpdateClick = (id) => {
+    const data = id.split("/Product/")[1];
+    router.push(`/product/productUpdate?id=${data}`);
+  };
+
+  const handleViewProduct = (uri) => {
+    console.log(uri);
+    window.open(uri, "_blank");
+  };
 
   const deleteProduct = [
     {
@@ -84,7 +91,7 @@ export default function productList() {
     useIndexResourceState(productList);
 
   const productRows = productList?.map(
-    ({ id, title, description, price, totalInventory }, index) => (
+    ({ id, title, description, price, totalInventory, onlineUrl }, index) => (
       <IndexTable.Row
         id={id}
         key={id}
@@ -92,11 +99,13 @@ export default function productList() {
         position={index}
       >
         <IndexTable.Cell>
-        <Link onClick={() => handleUpdateClick(String(id))}>
-            <Text variant="bodyMd" fontWeight="bold" as="span">
+          <Link onClick={() => handleUpdateClick(String(id))}>
+            <Text variant="bodyMd" fontWeight="bold" as="span" padding={4}>
               {title}
             </Text>
           </Link>
+        <br/>
+          <Link onClick={() => handleViewProduct(onlineUrl)}>View</Link>
         </IndexTable.Cell>
 
         <IndexTable.Cell>{price}</IndexTable.Cell>
