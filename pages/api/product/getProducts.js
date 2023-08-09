@@ -15,6 +15,7 @@ const handler = async (req, res) => {
                     id
                     title
                     totalInventory
+                    onlineStorePreviewUrl
                     priceRangeV2 {
                       maxVariantPrice {
                         amount
@@ -53,7 +54,8 @@ const handler = async (req, res) => {
         description: data.description,
         title : data.title,
         totalInventory : data.totalInventory,
-        price : data.priceRangeV2.maxVariantPrice.amount
+        price : data.priceRangeV2.maxVariantPrice.amount,
+        onlineUrl : data.onlineStorePreviewUrl
       })
     })
 

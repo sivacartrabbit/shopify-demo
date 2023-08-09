@@ -1,19 +1,19 @@
 import withMiddleware from "@/utils/middleware/withMiddleware.js";
-import clientProvider from "@/utils/clientProvider";
 
 const handler = async (req, res) => {
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     //GET, POST, PUT, DELETE
-    console.log("Serve this only if the request method is GET");
+    console.log("Serve this only if the request method is POST");
     return res.status(401).send({ error: true });
   }
 
+  console.log('okkkkkkk');
+
   try {
-    const GET_PRODUCT = `query product($id : ID!) {
-            product(id: $id) {
+    const UPDATE_PRODUCT = `query productUpdate($input: ProductInput!) {
+            productUpdate(input: $input) {
               title
               description
-              id
             }
           }`;
 
@@ -23,16 +23,20 @@ const handler = async (req, res) => {
       isOnline: true,
     });
 
-    const product = await client.query({
+    await client.query({
       data: {
-        query: GET_PRODUCT,
+        query: UPDATE_PRODUCT,
         variables: {
-          id: `gid://shopify/Product/${req.query.id}`,
+          id: req.body.id,
+          title: req.body.title,
+          description: req.body.description,
         },
       },
     });
 
-    return res.status(200).send({ data: product.body.data.product });
+    console.log('okk')
+
+    return res.status(200).send({ text: "Success!" });
   } catch (e) {
     console.error(e);
     return res.status(401).send({ error: e });

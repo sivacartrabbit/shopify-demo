@@ -14,45 +14,39 @@ import {
 export default function productCreate() {
   const app = useAppBridge();
   const fetch = useFetch();
-  const router = useRouter()
+  const router = useRouter();
 
+  const [id, setId] = useState('')
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
-  const [quantity, setQuantity] = useState(0);
-  const [status, setStatus] = useState("ACTIVE");
 
-  const statusOptios = [
-    { label: "Active (Default)", value: "ACTIVE" },
-    { label: "InActive", value: "ARCHIVED," },
-  ];
 
-  async function getProductInfo(id) {
-    console.log(id[0]);
-    const result = await fetch(`/api/product/getProduct`, {
+  async function getProductInfo(ids) {
+    var result = await fetch(`/api/product/getProduct?id=${ids[0]}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      query: { id: id[0] },
     });
-    console.log(result);
+    result = await result.json();
+    console.log(result.data);
+    setTitle(result.data.title);
+    setDescription(result.data.description);
+    setId(result.data.id)
   }
 
   async function handleSubmit() {
-    await fetch(`/api/product/createProduct`, {
+    await fetch(`/api/product/updateProduct`, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        title,
-        description,
-        price,
-        quantity,
-        status,
+        id : id,
+        title : title,
+        description : description,
       }),
     })
       .then((res) => {
@@ -98,7 +92,7 @@ export default function productCreate() {
         },
       }}
       primaryAction={{
-        content: "Save",
+        content: "Update",
         onAction: () => {
           handleSubmit();
         },
@@ -126,37 +120,6 @@ export default function productCreate() {
               autoComplete="off"
             />
           </Card>
-
-          <br />
-          <Card>
-            <FormLayout>
-              <FormLayout.Group condensed>
-                <TextField
-                  label="Price"
-                  value={price}
-                  onChange={handlePriceInput}
-                />
-                <TextField
-                  label="Quantity"
-                  value={quantity}
-                  onChange={handleQuantityInput}
-                />
-              </FormLayout.Group>
-            </FormLayout>
-          </Card>
-        </Layout.Section>
-
-        {/* right  */}
-        <Layout.Section oneHalf>
-          <Card>
-            <Select
-              label="Status"
-              options={statusOptios}
-              onChange={handleStatusChange}
-              value={status}
-            />
-          </Card>
-          <br />
         </Layout.Section>
       </Layout>
     </Page>
