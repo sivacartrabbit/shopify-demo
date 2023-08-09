@@ -55,25 +55,6 @@ export default function productCreate() {
       .catch((e) => console.error(e));
   }
 
-  const handleQuantityInput = useCallback((newValue) => {
-    if (!isNaN(newValue) && newValue >= 0) {
-      const val = newValue.replace(/^0+/, "");
-      setQuantity(val);
-    }
-  });
-
-  const handlePriceInput = useCallback((newValue) => {
-    if (!isNaN(newValue) && newValue >= 0) {
-      const val = newValue.replace(/^0+/, "");
-      setPrice(val);
-    }
-  });
-
-  const handleStatusChange = useCallback(
-    (value) => setStatus(Number(value)),
-    []
-  );
-
   useEffect(() => {
     const field = "id";
     const queryUrl = window.location.href;

@@ -7,8 +7,6 @@ const handler = async (req, res) => {
     return res.status(401).send({ error: true });
   }
 
-  console.log('okkkkkkk');
-
   try {
     const UPDATE_PRODUCT = `query productUpdate($input: ProductInput!) {
             productUpdate(input: $input) {
@@ -39,7 +37,7 @@ const handler = async (req, res) => {
     return res.status(200).send({ text: "Success!" });
   } catch (e) {
     console.error(e);
-    return res.status(401).send({ error: e });
+    return res.status(401).send({ error: 'error' });
   }
 };
 
