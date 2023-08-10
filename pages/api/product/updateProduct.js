@@ -1,4 +1,5 @@
 import withMiddleware from "@/utils/middleware/withMiddleware.js";
+import clientProvider from "@/utils/clientProvider";
 
 const handler = async (req, res) => {
   if (req.method !== "POST") {
@@ -8,10 +9,14 @@ const handler = async (req, res) => {
   }
 
   try {
-    const UPDATE_PRODUCT = `query productUpdate($input: ProductInput!) {
+    const UPDATE_PRODUCT = `mutation productUpdate($input: ProductInput!) {
             productUpdate(input: $input) {
-              title
-              description
+              product{
+                id
+                title
+                descriptionHtml
+              }
+             
             }
           }`;
 
@@ -21,23 +26,25 @@ const handler = async (req, res) => {
       isOnline: true,
     });
 
-    await client.query({
+    const result = await client.query({
       data: {
         query: UPDATE_PRODUCT,
         variables: {
-          id: req.body.id,
-          title: req.body.title,
-          description: req.body.description,
+          input: {
+            id: req.body.id,
+            title: req.body.title,
+            descriptionHtml: req.body.description,
+          },
         },
       },
     });
 
-    console.log('okk')
+    console.log(result);
 
-    return res.status(200).send({ text: "Success!" });
+    return res.status(200).send({ data: result });
   } catch (e) {
     console.error(e);
-    return res.status(401).send({ error: 'error' });
+    return res.status(401).send({ error: "error" });
   }
 };
 

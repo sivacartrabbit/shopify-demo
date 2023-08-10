@@ -16,7 +16,6 @@ import {
   HorizontalStack,
   Link,
   Icon,
-  Button,
 } from "@shopify/polaris";
 
 export default function productList() {
@@ -104,7 +103,7 @@ export default function productList() {
               {title}
             </Text>
           </Link>
-        <br/>
+          <br />
           <Link onClick={() => handleViewProduct(onlineUrl)}>View</Link>
         </IndexTable.Cell>
 
