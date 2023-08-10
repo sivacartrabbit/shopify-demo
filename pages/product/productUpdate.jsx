@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "@/components/hooks/useFetch";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useRouter } from "next/navigation";
@@ -7,19 +7,20 @@ import {
   Page,
   Layout,
   TextField,
-  Select,
-  FormLayout,
+  Box,
+  HorizontalStack,
+  Spinner,
 } from "@shopify/polaris";
 
 export default function productCreate() {
   const app = useAppBridge();
   const fetch = useFetch();
-  const router = useRouter();
 
-  const [id, setId] = useState('')
+  const [id, setId] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  const [isLoading, setIsloading] = useState(false);
 
   async function getProductInfo(ids) {
     var result = await fetch(`/api/product/getProduct?id=${ids[0]}`, {
@@ -30,29 +31,29 @@ export default function productCreate() {
       },
     });
     result = await result.json();
-    console.log(result.data);
     setTitle(result.data.title);
     setDescription(result.data.description);
-    setId(result.data.id)
+    setId(result.data.id);
   }
 
   async function handleSubmit() {
-    await fetch(`/api/product/updateProduct`, {
+    setIsloading(true);
+    var result = await fetch(`/api/product/updateProduct`, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id : id,
-        title : title,
-        description : description,
+        id: id,
+        title: title,
+        description: description,
       }),
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((e) => console.error(e));
+    });
+    result = await result.json();
+    setDescription(result.data.product.descriptionHtml);
+    setTitle(result.data.product.title);
+    setIsloading(false);
   }
 
   useEffect(() => {
@@ -67,10 +68,7 @@ export default function productCreate() {
     <Page
       backAction={{
         content: "Products",
-        url: "/products",
-        onAction: () => {
-          router.back();
-        },
+        url: "/product/productList",
       }}
       primaryAction={{
         content: "Update",
@@ -80,29 +78,37 @@ export default function productCreate() {
       }}
       title="Create Product"
     >
-      <Layout>
-        {/* left */}
-        <Layout.Section oneHalf>
-          <Card>
-            <TextField
-              label="Title"
-              type=""
-              value={title}
-              onChange={(e) => setTitle(e)}
-              autoComplete="off"
-            />
-            <br />
-            <TextField
-              label="Desctiption"
-              type=""
-              multiline={3}
-              value={description}
-              onChange={(e) => setDescription(e)}
-              autoComplete="off"
-            />
-          </Card>
-        </Layout.Section>
-      </Layout>
+      {!isLoading ? (
+        <Layout>
+          {/* left */}
+          <Layout.Section oneHalf>
+            <Card>
+              <TextField
+                label="Title"
+                type=""
+                value={title}
+                onChange={(e) => setTitle(e)}
+                autoComplete="off"
+              />
+              <br />
+              <TextField
+                label="Desctiption"
+                type=""
+                multiline={3}
+                value={description}
+                onChange={(e) => setDescription(e)}
+                autoComplete="off"
+              />
+            </Card>
+          </Layout.Section>
+        </Layout>
+      ) : (
+        <Box padding="6">
+          <HorizontalStack align="center" blockAlign="center">
+            <Spinner accessibilityLabel="Spinner example" size="large" />
+          </HorizontalStack>
+        </Box>
+      )}
     </Page>
   );
 }
