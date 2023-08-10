@@ -26,7 +26,7 @@ const handler = async (req, res) => {
       isOnline: true,
     });
 
-    var result = await client.query({
+    const result = await client.query({
       data: {
         query: UPDATE_PRODUCT,
         variables: {
@@ -39,9 +39,9 @@ const handler = async (req, res) => {
       },
     });
 
-   
+    console.log(result);
      result = await result.body.data.productUpdate
-     console.log(result);
+
     return res.status(200).send({ data: result });
   } catch (e) {
     console.error(e);
