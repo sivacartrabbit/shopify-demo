@@ -3,7 +3,6 @@ import clientProvider from "@/utils/clientProvider";
 
 const handler = async (req, res) => {
   if (req.method !== "GET") {
-    //GET, POST, PUT, DELETE
     console.log("Serve this only if the request method is GET");
     return res.status(401).send({ error: true });
   }
