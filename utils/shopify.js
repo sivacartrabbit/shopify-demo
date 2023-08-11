@@ -1,5 +1,7 @@
 import { DeliveryMethod, LogSeverity, shopifyApi } from "@shopify/shopify-api";
 import "@shopify/shopify-api/adapters/node";
+
+// webHooks Handlers
 import appUninstallHandler from "./webhooks/app_uninstalled";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -22,7 +24,7 @@ shopify.webhooks.addHandlers({
     deliveryMethod: DeliveryMethod.Http,
     callbackUrl: "/api/webhooks/app_uninstalled",
     callback: appUninstallHandler,
-  },
+  }
 });
 
 export default shopify;
