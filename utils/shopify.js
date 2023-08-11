@@ -3,6 +3,8 @@ import "@shopify/shopify-api/adapters/node";
 
 // webHooks Handlers
 import appUninstallHandler from "./webhooks/app_uninstalled";
+import cartCreateHandler from "./webhooks/cart_create";
+import prodcutCreateHandler from "./webhooks/product_create";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -24,6 +26,16 @@ shopify.webhooks.addHandlers({
     deliveryMethod: DeliveryMethod.Http,
     callbackUrl: "/api/webhooks/app_uninstalled",
     callback: appUninstallHandler,
+  },
+  CARTS_CREATE: {
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "/api/webhooks/cart_create",
+    callback: cartCreateHandler,
+  },
+  PRODUCTS_CREATE : {
+    deliveryMethod : DeliveryMethod.Http,
+    callbackUrl : "/api/webhooks/product_create",
+    callback: prodcutCreateHandler
   }
 });
 
